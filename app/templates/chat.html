@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pitaya RAG Chat</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- 引入Font Awesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        :root {
+            --user-bubble: #007bff;
+            --bot-bubble: #f1f1f1;
+            --text-dark: #333;
+            --text-light: #fff;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chat-container {
+            max-width: 800px;
+            margin: 20px auto;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            background-color: white;
+        }
+        
+        .chat-header {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.2rem;
+        }
+        
+        .chat-window {
+            height: 500px;
+            overflow-y: auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        
+        .message {
+            max-width: 70%;
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background-color: var(--user-bubble);
+            color: var(--text-light);
+            margin-left: auto;
+            border-bottom-right-radius: 5px;
+        }
+        
+        .bot-message {
+            background-color: var(--bot-bubble);
+            color: var(--text-dark);
+            margin-right: auto;
+            border-bottom-left-radius: 5px;
+        }
+        
+        .input-area {
+            display: flex;
+            padding: 15px;
+            background-color: white;
+            border-top: 1px solid #eee;
+        }
+        
+        .input-group {
+            width: 100%;
+        }
+        
+        .file-input {
+            display: none;
+        }
+        
+        .file-btn {
+            background-color: transparent;
+            border: none;
+            color: #007bff;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        
+        .typing-indicator {
+            display: flex;
+            padding: 10px;
+        }
+        
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ccc;
+            border-radius: 50%;
+            margin: 0 3px;
+            animation: typing 1.4s infinite ease-in-out;
+        }
+        
+        .typing-dot:nth-child(1) { animation-delay: 0s; }
+        .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+        
+        @keyframes typing {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="chat-container">
+        <div class="chat-header">
+            <i class="fas fa-robot"></i> Pitaya RAG ChatBot
+        </div>
+        <div class="chat-window" id="chatWindow">
+            <!-- 欢迎消息 -->
+            <div class="message bot-message">
+                你好！我是Pitaya RAG助手，你可以向我提问或上传文件让我分析。
+            </div>
+        </div>
+        <div class="input-area">
+            <button class="file-btn" id="fileBtn" title="上传文件">
+                <i class="fas fa-paperclip"></i>
+            </button>
+            <input type="file" id="fileInput" class="file-input" multiple>
+            <form id="chatForm" class="input-group">
+                <input type="text" class="form-control" id="question" name="question" placeholder="输入你的问题..." required>
+                <button class="btn btn-primary" type="submit">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 引入 Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script>
+        const chatWindow = document.getElementById('chatWindow');
+        const chatForm = document.getElementById('chatForm');
+        const questionInput = document.getElementById('question');
+        const fileBtn = document.getElementById('fileBtn');
+        const fileInput = document.getElementById('fileInput');
+
+        // 文件上传按钮点击事件
+        fileBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // 文件选择事件
+        fileInput.addEventListener('change', async (e) => {
+            const files = e.target.files;
+            if (files.length > 0) {
+                // 显示上传文件消息
+                const fileMessage = document.createElement('div');
+                fileMessage.classList.add('message', 'user-message');
+                fileMessage.innerHTML = `<i class="fas fa-file"></i> 已上传文件: ${files[0].name}`;
+                chatWindow.appendChild(fileMessage);
+                
+                // 滚动到聊天窗口底部
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                
+                // 显示正在处理指示器
+                showTypingIndicator();
+                
+                // 实际文件上传逻辑
+                try {
+                    const formData = new FormData();
+                    for (let i = 0; i < files.length; i++) {
+                        formData.append('files', files[i]);
+                    }
+                    
+                    const response = await fetch('/upload', {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    const data = await response.json();
+                    hideTypingIndicator();
+                    
+                    // 显示服务器响应
+                    const botMessage = document.createElement('div');
+                    botMessage.classList.add('message', 'bot-message');
+                    botMessage.textContent = data.message || '文件已成功上传并处理';
+                    chatWindow.appendChild(botMessage);
+                    
+                } catch (error) {
+                    hideTypingIndicator();
+                    console.error('文件上传出错:', error);
+                }
+                
+                // 滚动到聊天窗口底部
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+            }
+        });
+
+        // 显示正在输入指示器
+        function showTypingIndicator() {
+            const typingDiv = document.createElement('div');
+            typingDiv.classList.add('typing-indicator');
+            typingDiv.id = 'typingIndicator';
+            typingDiv.innerHTML = `
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            `;
+            chatWindow.appendChild(typingDiv);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        // 隐藏正在输入指示器
+        function hideTypingIndicator() {
+            const indicator = document.getElementById('typingIndicator');
+            if (indicator) {
+                indicator.remove();
+            }
+        }
+
+        chatForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const question = questionInput.value;
+            if (question) {
+                // 显示用户消息
+                const userMessage = document.createElement('div');
+                userMessage.classList.add('message', 'user-message');
+                userMessage.textContent = question;
+                chatWindow.appendChild(userMessage);
+
+                // 清空输入框
+                questionInput.value = '';
+
+                // 滚动到聊天窗口底部
+                chatWindow.scrollTop = chatWindow.scrollHeight;
+                
+                // 显示正在输入指示器
+                showTypingIndicator();
+
+                // 发送请求获取回答
+                try {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: `question=${encodeURIComponent(question)}`
+                    });
+                    const data = await response.text();
+                    
+                    // 隐藏正在输入指示器
+                    hideTypingIndicator();
+
+                    // 显示机器人消息
+                    const botMessage = document.createElement('div');
+                    botMessage.classList.add('message', 'bot-message');
+                    botMessage.textContent = data;
+                    chatWindow.appendChild(botMessage);
+
+                    // 滚动到聊天窗口底部
+                    chatWindow.scrollTop = chatWindow.scrollHeight;
+                } catch (error) {
+                    hideTypingIndicator();
+                    console.error('请求出错:', error);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

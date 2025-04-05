@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库更新</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- 引入Font Awesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- 引入Vue和Axios -->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+
+        body {
+            background-color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .update-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+
+        .update-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark-color);
+        }
+
+        .update-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .update-header i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+
+        .file-upload-area i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+
+        .file-upload-area p {
+            margin-bottom: 0;
+            color: var(--secondary-color);
+        }
+
+        .btn-custom {
+            padding: 10px 25px;
+            font-weight: 500;
+            border-radius: 30px;
+        }
+
+        .progress {
+            height: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="app" class="update-container">
+        <div class="update-header">
+            <i class="fas fa-database"></i>
+            <h1>知识库更新</h1>
+            <p class="lead">上传文件以更新您的知识库</p>
+        </div>
+
+        <div class="file-upload-area" 
+             @click="handleClick"
+             @dragover.prevent="handleDragOver"
+             @dragleave="handleDragLeave"
+             @drop.prevent="handleDrop"
+             :style="dropAreaStyle">
+            <i class="fas" :class="uploadIcon"></i>
+            <h5>{{ uploadText }}</h5>
+            <p v-html="fileNames"></p>
+        </div>
+
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary btn-custom" :disabled="!selectedFiles.length || isUploading" @click="uploadFiles">
+                <i class="fas" :class="uploadButtonIcon"></i> {{ uploadButtonText }}
+            </button>
+        </div>
+
+        <div class="progress">
+            <div class="progress-bar" role="progressbar" :style="{ width: progress + '%' }"></div>
+        </div>
+
+        <div class="status-message" :class="statusClass" v-if="showStatus">
+            {{ statusMessage }}
+        </div>
+    </div>
+
+    <!-- 引入 Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    
+    <script>
+        new Vue({
+            el: '#app',
+            data: {
+                selectedFiles: [],
+                progress: 0,
+                statusMessage: '',
+                statusClass: '',
+                showStatus: false,
+                isDragging: false,
+                isUploading: false,
+                uploadButtonText: '开始上传',
+                uploadButtonIcon: 'fa-upload',
+                uploadIcon: 'fa-cloud-upload-alt',
+                uploadText: '拖放文件到此处或点击选择文件',
+                fileNames: '支持PDF、Word、Excel、TXT等格式'
+            },
+            computed: {
+                dropAreaStyle() {
+                    return {
+                        borderColor: this.isDragging ? 'var(--primary-color)' : '#ced4da',
+                        backgroundColor: this.isDragging ? 'rgba(0, 123, 255, 0.05)' : 'transparent'
+                    }
+                }
+            },
+            methods: {
+                handleClick() {
+                    const fileInput = document.createElement('input');
+                    fileInput.type = 'file';
+                    fileInput.multiple = true;
+                    fileInput.onchange = (e) => this.handleFiles(e.target.files);
+                    fileInput.click();
+                },
+                handleDragOver() {
+                    this.isDragging = true;
+                },
+                handleDragLeave() {
+                    this.isDragging = false;
+                },
+                handleDrop(e) {
+                    this.isDragging = false;
+                    this.handleFiles(e.dataTransfer.files);
+                },
+                handleFiles(files) {
+                    if (files.length > 0) {
+                        this.selectedFiles = Array.from(files);
+                        this.uploadIcon = 'fa-file-alt';
+                        this.uploadText = `已选择 ${files.length} 个文件`;
+                        this.fileNames = Array.from(files).map(file => file.name).join('<br>');
+                    }
+                },
+                async uploadFiles() {
+                    if (this.selectedFiles.length === 0) return;
+
+                    const formData = new FormData();
+                    this.selectedFiles.forEach(file => {
+                        formData.append('files', file);
+                    });
+                    formData.append("application_model", "EC");
+
+                    try {
+                        this.isUploading = true;
+                        this.uploadButtonText = '上传中...';
+                        this.uploadButtonIcon = 'fa-spinner fa-spin';
+
+                        const response = await axios.post('/knowledge_api/update', formData, {
+                            onUploadProgress: progressEvent => {
+                                if (progressEvent.lengthComputable) {
+                                    this.progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                                }
+                            }
+                        });
+
+                        this.showStatusMessage('文件上传成功，知识库更新完成！', 'success');
+                    } catch (error) {
+                        const errorMsg = error.response?.data?.message || error.message;
+                        this.showStatusMessage(`上传失败: ${errorMsg}`, 'error');
+                    } finally {
+                        this.resetUploadState();
+                    }
+                },
+                showStatusMessage(message, type) {
+                    this.statusMessage = message;
+                    this.statusClass = type;
+                    this.showStatus = true;
+                },
+                resetUploadState() {
+                    this.isUploading = false;
+                    this.uploadButtonText = '开始上传';
+                    this.uploadButtonIcon = 'fa-upload';
+                    this.progress = 0;
+                }
+            }
+        });
+    </script>
+</body>
+</html>

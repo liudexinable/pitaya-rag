@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识库更新</title>
+    <!-- 引入 Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <!-- 引入Font Awesome图标 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+        }
+        
+        body {
+            background-color: var(--light-color);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .update-container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+            background-color: white;
+        }
+        
+        .update-header {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--dark-color);
+        }
+        
+        .update-header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+        
+        .update-header i {
+            font-size: 2.5rem;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #ced4da;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .file-upload-area:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(0, 123, 255, 0.05);
+        }
+        
+        .file-upload-area i {
+            font-size: 3rem;
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+        }
+        
+        .file-upload-area p {
+            margin-bottom: 0;
+            color: var(--secondary-color);
+        }
+        
+        .btn-custom {
+            padding: 10px 25px;
+            font-weight: 500;
+            border-radius: 30px;
+        }
+        
+        .progress {
+            height: 10px;
+            margin-top: 20px;
+            border-radius: 5px;
+        }
+        
+        .status-message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="update-container">
+        <div class="update-header">
+            <i class="fas fa-database"></i>
+            <h1>知识库更新</h1>
+            <p class="lead">上传文件以更新您的知识库</p>
+        </div>
+        
+        <div class="file-upload-area" id="dropArea">
+            <i class="fas fa-cloud-upload-alt"></i>
+            <h5>拖放文件到此处或点击选择文件</h5>
+            <p>支持PDF、Word、Excel、TXT等格式</p>
+            <input type="file" id="fileInput" class="d-none" multiple>
+        </div>
+        
+        <div class="d-grid gap-2">
+            <button class="btn btn-primary btn-custom" id="uploadBtn" disabled>
+                <i class="fas fa-upload"></i> 开始上传
+            </button>
+        </div>
+        
+        <div class="progress">
+            <div class="progress-bar" id="progressBar" role="progressbar" style="width: 0%"></div>
+        </div>
+        
+        <div class="status-message" id="statusMessage"></div>
+    </div>
+
+    <!-- 引入 Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <script>
+        const dropArea = document.getElementById('dropArea');
+        const fileInput = document.getElementById('fileInput');
+        const uploadBtn = document.getElementById('uploadBtn');
+        const progressBar = document.getElementById('progressBar');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        let selectedFiles = [];
+        
+        // 拖放区域事件
+        dropArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            handleFiles(e.target.files);
+        });
+        
+        // 拖放功能
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = 'var(--primary-color)';
+            dropArea.style.backgroundColor = 'rgba(0, 123, 255, 0.05)';
+        });
+        
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.style.borderColor = '#ced4da';
+            dropArea.style.backgroundColor = 'transparent';
+        });
+        
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.style.borderColor = '#ced4da';
+            dropArea.style.backgroundColor = 'transparent';
+            handleFiles(e.dataTransfer.files);
+        });
+        
+        // 处理选择的文件
+        function handleFiles(files) {
+            if (files.length > 0) {
+                selectedFiles = Array.from(files);
+                uploadBtn.disabled = false;
+                
+                // 更新UI显示选择的文件
+                dropArea.innerHTML = `
+                    <i class="fas fa-file-alt"></i>
+                    <h5>已选择 ${files.length} 个文件</h5>
+                    <p>${Array.from(files).map(file => file.name).join('<br>')}</p>
+                `;
+            }
+        }
+        
+        // 上传文件
+        uploadBtn.addEventListener('click', async () => {
+            if (selectedFiles.length === 0) return;
+            
+            const formData = new FormData();
+            const files = [];
+            selectedFiles.forEach(file => {
+                files.push(file);
+            });
+            formData.append('files', files);
+            formData.append("application_model","EC");
+            try {
+                uploadBtn.disabled = true;
+                uploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> 上传中...';
+                
+                const xhr = new XMLHttpRequest();
+                
+                xhr.upload.onprogress = (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        progressBar.style.width = `${percentComplete}%`;
+                    }
+                };
+                
+                xhr.onload = () => {
+                    if (xhr.status === 200) {
+                        showStatus('文件上传成功，知识库更新完成！', 'success');
+                    } else {
+                        showStatus('上传失败: ' + xhr.responseText, 'error');
+                    }
+                    
+                    uploadBtn.disabled = false;
+                    uploadBtn.innerHTML = '<i class="fas fa-upload"></i> 开始上传';
+                    progressBar.style.width = '0%';
+                };
+                
+                xhr.open('POST', '/knowledge_api/update', true);
+                xhr.send(formData);
+                
+            } catch (error) {
+                showStatus('上传出错: ' + error.message, 'error');
+                uploadBtn.disabled = false;
+                uploadBtn.innerHTML = '<i class="fas fa-upload"></i> 开始上传';
+                progressBar.style.width = '0%';
+            }
+        });
+        
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = `status-message ${type}`;
+            statusMessage.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
