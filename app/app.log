@@ -1,0 +1,24 @@
+[2025-04-05 19:31:56] INFO in knowledge_api: update-----
+[2025-04-05 19:33:27] INFO in knowledge_api: update-----
+[2025-04-05 19:33:32] INFO in knowledge_api: update-----
+[2025-04-05 19:33:45] INFO in knowledge_api: update-----
+[2025-04-05 19:34:24] INFO in knowledge_api: update-----
+[2025-04-05 19:34:55] INFO in knowledge_api: update-----
+[2025-04-05 19:35:26] INFO in knowledge_api: update-----
+[2025-04-05 19:36:08] INFO in knowledge_api: update-----
+[2025-04-05 19:37:23] INFO in knowledge_api: update-----
+[2025-04-05 19:37:23] INFO in knowledge_api: PDF 分页数: 1
+[2025-04-05 19:37:23] INFO in knowledge_api: PDF 分页处理完成
+[2025-04-05 19:37:56] INFO in knowledge_api: update-----
+[2025-04-05 19:37:56] INFO in knowledge_api: PDF 分页数: [Document(metadata={'producer': 'openhtmltopdf.com', 'creator': 'PyPDF', 'creationdate': '2025-03-03T10:09:15+08:00', 'viewport': 'width=device-width, initial-scale=1.0', 'title': 'Document', 'source': '/var/folders/1q/_15gn_pn4j1crclqxqcr_wfc0000gn/T/tmp1skk1abq.pdf', 'total_pages': 1, 'page': 0, 'page_label': '1'}, page_content='开票人： 侯娇\ndidi\n电子发票（普通发票）\n旅客运输服务 发票号码 : 25517000000063198386\n开票日期 : 2025年03月03日\n备\n注\n销\n售\n方\n信\n息\n购\n买\n方\n信\n息\n名称： 成都博智维讯信息技术股份有限公司\n统一社会信用代码/纳税人识别号： 91510100797822369H\n名称： 成都滴滴优行科技有限公司\n统一社会信用代码/纳税人识别号： 91510100MA6B7L2R7L\n项目名称 单\xa0\xa0价 数\xa0\xa0量 金\xa0\xa0额 税率/征收率 税\xa0\xa0额\n*运输服务*客运服务费 56.51 1 56.51 3% 1.70\n合 计 56.51¥ 1.70¥\n出行人 有效身份证件号 出行日期 出发地 到达地 等级 交通工具类型\n价 税 合 计 （ 大 写 ） （ 小 写 ） 58.21¥伍拾捌圆贰角壹分')]
+[2025-04-05 19:37:56] INFO in knowledge_api: PDF 分页处理完成
+[2025-04-05 19:45:03] INFO in knowledge_api: update-----
+[2025-04-05 19:45:04] INFO in knowledge_api: PDF 分页数: [Document(metadata={'producer': 'openhtmltopdf.com', 'creator': 'PyPDF', 'creationdate': '2025-03-03T10:09:15+08:00', 'viewport': 'width=device-width, initial-scale=1.0', 'title': 'Document', 'source': '/var/folders/1q/_15gn_pn4j1crclqxqcr_wfc0000gn/T/tmpa7ihzqoj.pdf', 'total_pages': 1, 'page': 0, 'page_label': '1'}, page_content='开票人： 侯娇\ndidi\n电子发票（普通发票）\n旅客运输服务 发票号码 : 25517000000063198386\n开票日期 : 2025年03月03日\n备\n注\n销\n售\n方\n信\n息\n购\n买\n方\n信\n息\n名称： 成都博智维讯信息技术股份有限公司\n统一社会信用代码/纳税人识别号： 91510100797822369H\n名称： 成都滴滴优行科技有限公司\n统一社会信用代码/纳税人识别号： 91510100MA6B7L2R7L\n项目名称 单\xa0\xa0价 数\xa0\xa0量 金\xa0\xa0额 税率/征收率 税\xa0\xa0额\n*运输服务*客运服务费 56.51 1 56.51 3% 1.70\n合 计 56.51¥ 1.70¥\n出行人 有效身份证件号 出行日期 出发地 到达地 等级 交通工具类型\n价 税 合 计 （ 大 写 ） （ 小 写 ） 58.21¥伍拾捌圆贰角壹分')]
+[2025-04-05 19:45:04] INFO in knowledge_api: PDF 分页处理完成
+[2025-04-05 19:45:04] INFO in knowledge_api: PDF 处理完成，清理临时文件
+[2025-04-05 21:38:16] INFO in knowledge_api: update-----
+[2025-04-05 21:39:14] INFO in knowledge_api: update-----
+[2025-04-05 21:39:16] INFO in knowledge_api: PDF 处理失败: Unable to get page count. Is poppler installed and in PATH?
+[2025-04-05 21:40:39] INFO in knowledge_api: update-----
+[2025-04-05 21:41:34] INFO in knowledge_api: update-----
+[2025-04-05 21:43:07] INFO in knowledge_api: PDF 处理失败: Unable to get page count. Is poppler installed and in PATH?
