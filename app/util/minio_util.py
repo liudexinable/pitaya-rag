@@ -26,6 +26,7 @@ def upload_to_minio(file_path,object_name: str) -> str:
     """
     client = get_minio_client()
     bucket_name = os.getenv("MINIO_BUCKET")
+    minio_url = os.getenv("MINIO_URL")
     try:
         # 上传文件
         client.fput_object(
@@ -35,7 +36,7 @@ def upload_to_minio(file_path,object_name: str) -> str:
             content_type="image/jpeg"
         )
         print(f"文件 {file_path} 成功上传至 {bucket_name}/{object_name}")
-        return f"http://td2.cat-kk.com.cn:9001/{bucket_name}/{object_name}"
+        return f"{minio_url}/{bucket_name}/{object_name}"
        # return bucket_name + "/" + object_name
     except Exception as e:
         print(f"上传失败: {str(e)}")

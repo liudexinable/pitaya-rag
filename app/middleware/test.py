@@ -278,4 +278,4 @@ if __name__ == "__main__":
     print(searcher.search("千亿级参数大模型通义千问 2.0"))
 
     print("\n图片搜索:")
-    print(searcher.search("s3://pdf-images/pages/page0_img0.jpg"))
+    print(searcher.search("http://192.168.9.180:9001/pitaya-uat/pages/page37_img0.jpeg"))

@@ -18,10 +18,7 @@ class ZhipuEmbedding:
             model="embedding-3",
             input=[text]
         )
-        if response['code'] == 200:
-            return response['data']['embedding']
-        else:
-            raise Exception(f"API Error: {response['msg']}")
+        return response.data[0].embedding
     def embed_img(self, image_url: str) -> List[float]:
         """生成图片embedding"""
         image_path = download_file(image_url)
@@ -31,8 +28,5 @@ class ZhipuEmbedding:
             model="embedding-3",
             input=[encoded_image]
         )
-        if response['code'] == 200:
-            return response['data']['embedding']
-        else:
-            raise Exception(f"API Error: {response['msg']}")
+        return response.data[0].embedding
 

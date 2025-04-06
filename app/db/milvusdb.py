@@ -29,7 +29,7 @@ class MilvusManager:
             FieldSchema(name="sys_model", dtype=DataType.VARCHAR, max_length=30),
             FieldSchema(name="status", dtype=DataType.VARCHAR, max_length=30),
             FieldSchema(name="file_name", dtype=DataType.VARCHAR, max_length=200),
-            FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=512),
+            FieldSchema(name="embedding", dtype=DataType.FLOAT_VECTOR, dim=2048),
             FieldSchema(name="content_type", dtype=DataType.VARCHAR, max_length=20),
             FieldSchema(name="text_content", dtype=DataType.VARCHAR, max_length=4000),
             FieldSchema(name="image_path", dtype=DataType.VARCHAR, max_length=512),
