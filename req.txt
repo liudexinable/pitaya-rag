@@ -3,5 +3,6 @@ pdf2image pytesseract
 pillow pypdf minio python-dotenv
 transformers faiss-cpu
 pymilvus zhipuai
+langchain fastapi
 
 pip install --force-reinstall pymupdf
