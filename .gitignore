@@ -5,3 +5,5 @@
 .DS_Store
 **/.DS_Store
 rebel.xml
+__pycache__/
+*.pyc
