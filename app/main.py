@@ -4,7 +4,10 @@ from fastapi.staticfiles import StaticFiles
 
 from app.routes.api import knowledge_api
 from app.routes.web_ui import chat_web, update_web
+from app.util.setup_logging import setup_logging
 
+# 在 FastAPI 启动前调用
+setup_logging()
 app = FastAPI()
 
 app.include_router(chat_web.router)

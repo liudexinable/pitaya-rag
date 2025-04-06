@@ -1,0 +1,7 @@
+pip install
+pdf2image pytesseract
+pillow pypdf minio python-dotenv
+transformers faiss-cpu
+pymilvus zhipuai
+
+pip install --force-reinstall pymupdf
